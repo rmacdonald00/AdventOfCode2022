@@ -25,13 +25,26 @@ namespace AdventOfCode2022.DaySolutions
             return totalPoints.ToString();
         }
 
+        private static List<(Move opp, Move me, Result result)> allGameOptions = new List<(Move opp, Move me, Result result)>()
+            {
+                (Move.Rock, Move.Rock, Result.Tie),
+                (Move.Rock, Move.Paper, Result.Win),
+                (Move.Rock, Move.Scissors, Result.Loss),
+                (Move.Paper, Move.Rock, Result.Loss),
+                (Move.Paper, Move.Paper, Result.Tie),
+                (Move.Paper, Move.Scissors, Result.Win),
+                (Move.Scissors, Move.Rock, Result.Win),
+                (Move.Scissors, Move.Paper, Result.Loss),
+                (Move.Scissors, Move.Scissors, Result.Tie),
+            };
+
         private List<RpsRound> ParseRounds()
         {
             var roundData = _rawInput.Split("\r\n");
             return roundData.Select(x =>
             {
                 var plays = x.Split(" ").Select(y => y.ToCharArray()[0]).ToList();
-                return new RpsRound(plays[0], plays[1]);
+                return new RpsRound(AbcToMove(plays[0]), XyzToMove(plays[1]));
             }).ToList();
         }
 
@@ -41,63 +54,40 @@ namespace AdventOfCode2022.DaySolutions
             return roundData.Select(x =>
             {
                 var plays = x.Split(" ").Select(y => y.ToCharArray()[0]).ToList();
-                var myPlay = GetMyPlay(plays[0], plays[1]);
-                return new RpsRound(plays[0], myPlay);
+                return new RpsRound(AbcToMove(plays[0]), XyzToResult(plays[1]));
             }).ToList();
         }
 
-        private char GetMyPlay(char opponent, char result)
+        private Move AbcToMove(char move)
         {
-            Move oppMove = Move.Rock;
-            Result gameResult = Result.Tie;
-
-            switch (opponent)
+            switch (move)
             {
-                case 'A': oppMove = Move.Rock; break;
-                case 'B': oppMove = Move.Paper; break;
-                case 'C': oppMove = Move.Scissors; break;
+                case 'A': return Move.Rock;
+                case 'B': return Move.Paper;
+                default: return Move.Scissors;
             }
-
-            switch (result)
-            {
-                case 'X': gameResult = Result.Loss; break;
-                case 'Y': gameResult = Result.Tie; break;
-                case 'Z': gameResult = Result.Win; break;
-            }
-
-            if(gameResult == Result.Tie)
-            {
-                return opponent;
-            } else if(gameResult == Result.Win)
-            {
-                if(oppMove == Move.Rock)
-                {
-                    return 'Y';
-                } else if (oppMove == Move.Paper)
-                {
-                    return 'Z';
-                } else //scissors
-                {
-                    return 'X';
-                }
-            } else //loss
-            {
-                if (oppMove == Move.Rock)
-                {
-                    return 'Z';
-                }
-                else if (oppMove == Move.Paper)
-                {
-                    return 'X';
-                }
-                else //scissors
-                {
-                    return 'Y';
-                }
-            }
-
-            return 'A';
         }
+
+        private Move XyzToMove(char move)
+        {
+            switch (move)
+            {
+                case 'X': return Move.Rock;
+                case 'Y': return Move.Paper;
+                default: return Move.Scissors;
+            }
+        }
+
+        private Result XyzToResult(char move)
+        {
+            switch (move)
+            {
+                case 'X': return Result.Loss;
+                case 'Y': return Result.Tie;
+                default: return Result.Win;
+            }
+        }
+
         private enum Result
         {
             Tie,
@@ -113,35 +103,27 @@ namespace AdventOfCode2022.DaySolutions
 
         private class RpsRound
         {
-            // A=Rock, B=Paper, C=Scissors
-            // X=Rock, Y=Paper, Z=Scissors
-            private readonly Move _opponent;
-            private readonly Move _me;
+            private Move _opponent;
+            private Move _me;
+            private Result _gameResult;
 
-            public RpsRound(char opponent, char me)
+            public RpsRound(Move opponent, Move me)
             {
-                switch (me)
-                {
-                    case 'X': _me = Move.Rock; break;
-                    case 'Y': _me = Move.Paper; break;
-                    case 'Z': _me = Move.Scissors; break;
-                    //part 2 mess:
-                    case 'A': _me = Move.Rock; break;
-                    case 'B': _me = Move.Paper; break;
-                    case 'C': _me = Move.Scissors; break;
-                }
+                _opponent = opponent;
+                _me = me;
+                _gameResult = allGameOptions.First(x => x.opp == opponent && x.me == me).result;
+            }
 
-                switch (opponent)
-                {
-                    case 'A': _opponent = Move.Rock; break;
-                    case 'B': _opponent = Move.Paper; break;
-                    case 'C': _opponent = Move.Scissors; break;
-                }
+            public RpsRound(Move opponent, Result result)
+            {
+                _opponent = opponent;
+                _gameResult = result;
+                _me = allGameOptions.First(x => x.opp == opponent && x.result == result).me;
             }
 
             public int GetScore()
             {
-                return GetScoreForMovePlayed() + GetScoreForResult(GetResult());
+                return GetScoreForMovePlayed() + GetScoreForResult(_gameResult);
             }
 
             private int GetScoreForMovePlayed()
@@ -155,34 +137,12 @@ namespace AdventOfCode2022.DaySolutions
                 }
             }
 
-            private Result GetResult()
-            {
-                if(_me == _opponent)
-                {
-                    return Result.Tie;
-                }
-                if (_me == Move.Rock)
-                {
-                    return _opponent == Move.Scissors ? Result.Win : Result.Loss;
-                }
-                if (_me == Move.Paper)
-                {
-                    return _opponent == Move.Rock ? Result.Win : Result.Loss;
-                }
-                if (_me == Move.Scissors)
-                {
-                    return _opponent == Move.Paper ? Result.Win : Result.Loss;
-                }
-                return Result.Loss; // for zero points
-            }
-
             private int GetScoreForResult(Result result)
             {
                 switch (result)
                 {
                     case Result.Win: return 6;
                     case Result.Tie: return 3;
-                    //case Result.Loss: return 0;
                     default: return 0;
                 }
             }
