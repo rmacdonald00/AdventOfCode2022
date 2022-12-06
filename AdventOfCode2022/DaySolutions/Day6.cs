@@ -23,26 +23,17 @@ namespace AdventOfCode2022.DaySolutions
 
         private string SolveBySize(int numDistinctCharsInARowNeeded)
         {
-            var charArr = _rawInput.ToCharArray();
-            var i = numDistinctCharsInARowNeeded - 1;
-            var recentChars = _rawInput.Substring(0, numDistinctCharsInARowNeeded).ToCharArray();
-            while (i < charArr.Length)
+            var i = numDistinctCharsInARowNeeded;
+            while (i < _rawInput.Length)
             {
-                recentChars[i % numDistinctCharsInARowNeeded] = charArr[i];
-                if (!ContainsDuplicates(recentChars))
+                HashSet<char> charSet = new HashSet<char>(_rawInput.Substring(i - numDistinctCharsInARowNeeded, numDistinctCharsInARowNeeded).ToCharArray());
+                if (charSet.Count == numDistinctCharsInARowNeeded)
                 {
-                    return (i + 1).ToString();
+                    return (i).ToString();
                 }
                 i++;
             }
             return "oopsies, something wrong";
-        }
-
-        private bool ContainsDuplicates(char[] recentChars)
-        {
-
-            HashSet<char> charSet = new HashSet<char>(recentChars);
-            return charSet.Count != recentChars.Length;
         }
     }
 }
