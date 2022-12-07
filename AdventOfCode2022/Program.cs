@@ -32,6 +32,7 @@ namespace AdventOfCode2022
         {
             var rawInputText = ReadInput(day, useTestData);
 
+
             // This is icky, I know, but I don't really care
             switch (day)
             {
@@ -41,6 +42,7 @@ namespace AdventOfCode2022
                 case 4: return new Day4(rawInputText);
                 case 5: return new Day5(rawInputText);
                 case 6: return new Day6(rawInputText);
+                case 7: return new Day7(rawInputText);
                 default: return null;
             }
         }
