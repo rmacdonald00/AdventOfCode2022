@@ -45,9 +45,6 @@ namespace AdventOfCode2022.DaySolutions
                 if(commandText == "cd")
                 {
                     currentDirectory = currentDirectory.getDirectory(lines[0].Split(" ")[1]);
-                //} else if(commandText == "dir")
-                //{
-                //    currentDirectory = currentDirectory.getDirectory(lines[0].Split(" ")[1]);
                 } else if(commandText == "ls")
                 {
                     for(var i = 1; i < lines.Length; i++)
