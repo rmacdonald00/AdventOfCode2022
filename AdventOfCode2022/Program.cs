@@ -43,6 +43,7 @@ namespace AdventOfCode2022
                 case 5: return new Day5(rawInputText);
                 case 6: return new Day6(rawInputText);
                 case 7: return new Day7(rawInputText);
+                case 8: return new Day8(rawInputText);
                 default: return null;
             }
         }
