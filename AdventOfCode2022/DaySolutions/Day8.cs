@@ -42,9 +42,9 @@ namespace AdventOfCode2022.DaySolutions
             var totalCount = 0;
             totalCount += trees.Count * 2; // side edges
             totalCount += (trees[0].Count - 2) * 2;
-            for(int i = 1; i < trees.Count - 1; i++)
+            for (int i = 0; i < trees.Count - 1; i++)
             {
-                for(int j = 1; j < trees[i].Count - 1; j++)
+                for(int j = 0; j < trees[i].Count - 1; j++)
                 {
                     if (GetIsVisible(trees, i, j)) totalCount++;
                 }
