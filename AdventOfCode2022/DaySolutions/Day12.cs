@@ -19,8 +19,23 @@ namespace AdventOfCode2022.DaySolutions
 
         public override string GetPart2Solution()
         {
-
-            return "";
+            //main idea in case I come back confused
+            // 1) flip adjacency matrix
+            // 2) use dest as source
+            // 3) find min of those
+            //note: I did try to loop through all 100+ source indices and do dijkstras...didn't work
+            var parsedVals = ParseToAdjacencyMatrixPart2();
+            var dists = Dijkstras(parsedVals.matrix, parsedVals.destIndex);
+            var minPathDist = int.MaxValue;
+            foreach(var source in parsedVals.sourceIndices)
+            {
+                if(dists[source] < minPathDist)
+                {
+                    minPathDist = dists[source];
+                }
+            }
+            
+            return minPathDist.ToString();
         }
 
         private (List<List<int>> matrix, int sourceIndex, int destIndex) ParseToAdjacencyMatrix()
@@ -79,7 +94,65 @@ namespace AdventOfCode2022.DaySolutions
             return (adjacencyMatrix, sourceIndex, destIndex);
         }
 
-        
+        private (List<List<int>> matrix, List<int> sourceIndices, int destIndex) ParseToAdjacencyMatrixPart2()
+        {
+            var inputRows = _rawInput.Split("\r\n").Select(x => x.ToCharArray()).ToList();
+            var numIndices = inputRows.Count * inputRows[0].Length;
+            var sourceIndex = new List<int>();
+            var destIndex = 0;
+            var adjacencyMatrix = new List<List<int>>();
+            for (int i = 0; i < numIndices; i++)
+            {
+                adjacencyMatrix.Add(new List<int>());
+                for (int j = 0; j < numIndices; j++)
+                {
+                    adjacencyMatrix[i].Add(0);
+                }
+            }
+
+            for (int i = 0; i < inputRows.Count; i++)
+            {
+                for (int j = 0; j < inputRows[i].Length; j++)
+                {
+                    var vertexIndex = i * inputRows[i].Length + j;
+                    var cellValue = inputRows[i][j];
+                    if (cellValue == 'S' || cellValue == 'a')
+                    {
+                        sourceIndex.Add(vertexIndex);
+                        cellValue = 'a';
+                        inputRows[i][j] = 'a';
+                    }
+                    else if (cellValue == 'E')
+                    {
+                        destIndex = vertexIndex;
+                        cellValue = 'z';
+                        inputRows[i][j] = 'z';
+
+                    }
+                    if (i != 0 && inputRows[i - 1][j] >= cellValue - 1)
+                    {
+                        adjacencyMatrix[vertexIndex][(i - 1) * inputRows[i].Length + j] = 1;
+                    }
+                    if (i != inputRows.Count - 1 && inputRows[i + 1][j] >= cellValue - 1)
+                    {
+                        adjacencyMatrix[vertexIndex][(i + 1) * inputRows[i].Length + j] = 1;
+
+                    }
+                    if (j != 0 && inputRows[i][j - 1] >= cellValue - 1)
+                    {
+                        adjacencyMatrix[vertexIndex][i * inputRows[i].Length + j - 1] = 1;
+
+                    }
+                    if (j != inputRows[i].Length - 1 && inputRows[i][j + 1] >= cellValue - 1)
+                    {
+                        adjacencyMatrix[vertexIndex][i * inputRows[i].Length + j + 1] = 1;
+                    }
+                }
+            }
+            return (adjacencyMatrix, sourceIndex, destIndex);
+        }
+
+
         private List<int> Dijkstras(List<List<int>> matrix, int sourceIndex)
         {
             GFG g = new GFG();
