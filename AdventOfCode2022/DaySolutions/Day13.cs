@@ -28,7 +28,33 @@ namespace AdventOfCode2022.DaySolutions
         
         public override string GetPart2Solution()
         {
-            return "";
+            var packets = ParsePacketsPart2();
+            packets.Add(GetListObj("[[2]]", true));
+            packets.Add(GetListObj("[[6]]", true));
+            packets.Sort();
+
+            var product = 1;
+            for (int i = 0; i < packets.Count; i++){
+                if (packets[i]._identifiable)
+                {
+                    product *= (i + 1);
+                }
+            }
+            return product.ToString();
+        }
+
+        private List<ComparableFunkyList> ParsePacketsPart2()
+        {
+            var packets = new List<ComparableFunkyList>();
+
+            var groups = _rawInput.Replace("\r\n\r\n", "\r\n").Split("\r\n");
+            foreach (var group in groups)
+            {
+
+                packets.Add(GetListObj(group));
+            }
+
+            return packets;
         }
 
 
@@ -59,12 +85,14 @@ namespace AdventOfCode2022.DaySolutions
             }
         }
 
-        private class ComparableFunkyList : InfiniteObject
+        private class ComparableFunkyList : InfiniteObject, IComparable
         {
             public readonly List<InfiniteObject> _values;
+            public readonly bool _identifiable;
 
-            public ComparableFunkyList(ComparableFunkyList parent) : base(parent)
+            public ComparableFunkyList(ComparableFunkyList parent, bool identifiable = false) : base(parent)
             {
+                _identifiable = identifiable;
                 _values = new List<InfiniteObject>();
             }
 
@@ -87,6 +115,11 @@ namespace AdventOfCode2022.DaySolutions
             {
                 return _values[index];
             }
+
+            public int CompareTo(object obj)
+            {
+                return GetInOrder(this, (ComparableFunkyList) obj);
+            }
         }
 
         private List<(InfiniteObject leftItem, InfiniteObject rightItem)> ParsePackets()
@@ -107,9 +140,9 @@ namespace AdventOfCode2022.DaySolutions
             return packets;
         }
 
-        private ComparableFunkyList GetListObj(string left)
+        private ComparableFunkyList GetListObj(string left, bool identifiable = false)
         {
-            var rootList = new ComparableFunkyList(null);
+            var rootList = new ComparableFunkyList(null, identifiable);
             var currLeftList = rootList;
             var i = 1; //ignore first [
             while (i < left.Length - 1)// ignore last ]
@@ -120,7 +153,7 @@ namespace AdventOfCode2022.DaySolutions
                 }
                 else if (left[i] == '[')
                 {
-                    var newList = new ComparableFunkyList(currLeftList);
+                    var newList = new ComparableFunkyList(currLeftList, identifiable);
                     currLeftList.AddToList(newList);
                     currLeftList = newList;
                     i++;
@@ -140,7 +173,7 @@ namespace AdventOfCode2022.DaySolutions
             return rootList;
         }
 
-        private int GetInOrder(InfiniteObject leftObj, InfiniteObject rightObj) //-1 in order, 0 equal, 1 out of order
+        private static int GetInOrder(InfiniteObject leftObj, InfiniteObject rightObj) //-1 in order, 0 equal, 1 out of order
         {
             if(leftObj.GetType() == typeof(ComparableInt) && rightObj.GetType() == typeof(ComparableInt))
             {
