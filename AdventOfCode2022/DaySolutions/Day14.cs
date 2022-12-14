@@ -143,12 +143,17 @@ namespace AdventOfCode2022.DaySolutions
             var lastSandRested = true;
             while (lastSandRested)
             {
-                Console.WriteLine($"{numSandDropped}-----------------------------------");
-                PrintMap(map);
+                //Console.WriteLine($"{numSandDropped}-----------------------------------");
+                //PrintMap(map);
                 // see if sand rests
-                var nextLocation = GetSandLocation(map, startingX, startingY);
+                var nextLocation = GetSandLocationPart2(map, startingX, startingY);
                 if (nextLocation.x == -1 || nextLocation.y == -1)
                 {
+                    lastSandRested = false;
+                } else if (nextLocation.x == 500 && nextLocation.y == 0)
+                {
+                    numSandDropped++;
+                    map[nextLocation.x][nextLocation.y] = 'o';
                     lastSandRested = false;
                 }
                 else
@@ -203,9 +208,77 @@ namespace AdventOfCode2022.DaySolutions
             //
         }
 
+        private (int x, int y) GetSandLocationPart2(List<List<char>> map, int startingX, int startingY)
+        {
+            var currentX = startingX;
+            var currentY = startingY;
+            //var i = 0;
+            //One check
+            while (true)
+            {
+                //i++;
+                //Console.WriteLine($"{i}-----------------------------------");
+                //PrintMap(map);
+                if (OkayIndexPart2(map, currentX, currentY + 1) && map[currentX][currentY + 1] == '.') //move down
+                {
+                    currentY++;
+                    continue;
+                }
+                else if (OkayIndexPart2(map, currentX - 1, currentY + 1) && map[currentX - 1][currentY + 1] == '.') //move down/left
+                {
+                    currentX--;
+                    currentY++;
+                    continue;
+                }
+                else if (OkayIndexPart2(map, currentX + 1, currentY + 1) && map[currentX + 1][currentY + 1] == '.') //move down/right 
+                {
+                    currentX++;
+                    currentY++;
+                    continue;
+                }
+                else if (!OkayIndexPart2(map, currentX, currentY + 1) && !OkayIndexPart2(map, currentX - 1, currentY + 1) && !OkayIndexPart2(map, currentX + 1, currentY + 1))
+                {
+                    return (-1, -1);
+                }
+                else if (OkayIndexPart2(map, currentX, currentY))
+                {
+                    return (currentX, currentY);
+                }
+                else
+                {
+                    return (-1, -1);
+                }
+            }
+            //
+        }
+
         private bool OkayIndex(List<List<char>> map, int startingX, int startingY)
         {
+
             return startingX >= 0 && startingY >= 0 && startingX < map.Count && startingY < map[startingX].Count;
+        }
+
+        private bool OkayIndexPart2(List<List<char>> map, int startingX, int startingY)
+        {
+            var newRow = new List<char>();
+            for (int j = 0; j < map[0].Count - 1; j++)
+            {
+                newRow.Add('.');
+            }
+            newRow.Add('#');
+
+            if (startingX < 0)
+            {
+                var newMap = new List<List<char>>();
+                newMap.Add(newRow);
+                newMap.AddRange(map);
+                map = newMap;
+            }
+            if(startingX >= map.Count)
+            {
+                map.Add(newRow);
+            }
+            return startingY >= 0  && startingY < map[startingX].Count;
         }
 
         private void PrintMap(List<List<char>> map)
