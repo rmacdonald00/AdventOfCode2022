@@ -60,26 +60,19 @@ namespace AdventOfCode2022.DaySolutions
 
         private abstract class InfiniteObject
         {
-            public readonly ComparableFunkyList _parent;
-
-            public InfiniteObject(ComparableFunkyList parent)
-            {
-                _parent = parent;
-            }
-
-            public abstract ComparableFunkyList GetAsFunkyList();
+           public abstract ComparableFunkyList GetAsFunkyList();
         }
         private class ComparableInt : InfiniteObject
         {
             public readonly int _value;
-            public ComparableInt(int value, ComparableFunkyList parent) : base(parent)
+            public ComparableInt(int value)
             {
                 _value = value;
             }
 
             public override ComparableFunkyList GetAsFunkyList()
             {
-                var myList = new ComparableFunkyList(_parent);
+                var myList = new ComparableFunkyList(null); //parent doesn't matter here
                 myList.AddToList(this);
                 return myList;
             }
@@ -87,12 +80,14 @@ namespace AdventOfCode2022.DaySolutions
 
         private class ComparableFunkyList : InfiniteObject, IComparable
         {
-            public readonly List<InfiniteObject> _values;
+            private readonly List<InfiniteObject> _values;
             public readonly bool _identifiable;
+            public readonly ComparableFunkyList _parent;
 
-            public ComparableFunkyList(ComparableFunkyList parent, bool identifiable = false) : base(parent)
+            public ComparableFunkyList(ComparableFunkyList parent, bool identifiable = false)
             {
                 _identifiable = identifiable;
+                _parent = parent;
                 _values = new List<InfiniteObject>();
             }
 
@@ -166,7 +161,7 @@ namespace AdventOfCode2022.DaySolutions
                 else //number
                 {
                     var firstMatch = Regex.Matches(left.Substring(i), @"[\d]+")[0].Value;
-                    currLeftList.AddToList(new ComparableInt(int.Parse(firstMatch), currLeftList));
+                    currLeftList.AddToList(new ComparableInt(int.Parse(firstMatch)));
                     i += firstMatch.Length;
                 }
             }
@@ -183,21 +178,24 @@ namespace AdventOfCode2022.DaySolutions
             {
                 var order = 0;
                 var indexAt = 0;
-                while(order == 0)
+
+                var leftFunkyList = ((ComparableFunkyList)leftObj);
+                var rightFunkyList = ((ComparableFunkyList)rightObj);
+                while (order == 0)
                 {
-                    if(indexAt >= ((ComparableFunkyList)leftObj).Count() && indexAt < ((ComparableFunkyList)rightObj).Count())
+                    if(indexAt >= leftFunkyList.Count() && indexAt < rightFunkyList.Count())
                     {
                         return -1;
                     }
-                    if (indexAt >= ((ComparableFunkyList)rightObj).Count() && indexAt < ((ComparableFunkyList)leftObj).Count())
+                    if (indexAt >= rightFunkyList.Count() && indexAt < leftFunkyList.Count())
                     {
                         return 1;
                     }
-                    if (indexAt >= ((ComparableFunkyList)rightObj).Count() && indexAt >= ((ComparableFunkyList)leftObj).Count())
+                    if (indexAt >= rightFunkyList.Count() && indexAt >= leftFunkyList.Count())
                     {
                         return 0;
                     }
-                    order = GetInOrder(((ComparableFunkyList)leftObj).GetObjectAtIndex(indexAt), ((ComparableFunkyList)rightObj).GetObjectAtIndex(indexAt));
+                    order = GetInOrder(leftFunkyList.GetObjectAtIndex(indexAt), rightFunkyList.GetObjectAtIndex(indexAt));
                     indexAt++;
                 }
                 return order;
