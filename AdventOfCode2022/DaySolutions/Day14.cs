@@ -132,7 +132,6 @@ namespace AdventOfCode2022.DaySolutions
                     }
                 }
             }
-
             return map;
         }
 
@@ -143,14 +142,12 @@ namespace AdventOfCode2022.DaySolutions
             var lastSandRested = true;
             while (lastSandRested)
             {
-                //Console.WriteLine($"{numSandDropped}-----------------------------------");
-                //PrintMap(map);
                 // see if sand rests
                 var nextLocation = GetSandLocationPart2(map, startingX, startingY);
                 if (nextLocation.x == -1 || nextLocation.y == -1)
                 {
                     lastSandRested = false;
-                } else if (nextLocation.x == 500 && nextLocation.y == 0)
+                } else if (nextLocation.x == startingX && nextLocation.y == startingY)
                 {
                     numSandDropped++;
                     map[nextLocation.x][nextLocation.y] = 'o';
@@ -170,13 +167,9 @@ namespace AdventOfCode2022.DaySolutions
         {
             var currentX = startingX;
             var currentY = startingY;
-            //var i = 0;
-            //One check
+
             while (true)
             {
-                //i++;
-                //Console.WriteLine($"{i}-----------------------------------");
-                //PrintMap(map);
                 if(OkayIndex(map, currentX, currentY+1) && map[currentX][currentY + 1] == '.') //move down
                 {
                     currentY++;
@@ -205,20 +198,14 @@ namespace AdventOfCode2022.DaySolutions
                     return (-1, -1);
                 }
             }
-            //
         }
 
         private (int x, int y) GetSandLocationPart2(List<List<char>> map, int startingX, int startingY)
         {
             var currentX = startingX;
             var currentY = startingY;
-            //var i = 0;
-            //One check
             while (true)
             {
-                //i++;
-                //Console.WriteLine($"{i}-----------------------------------");
-                //PrintMap(map);
                 if (OkayIndexPart2(map, currentX, currentY + 1) && map[currentX][currentY + 1] == '.') //move down
                 {
                     currentY++;
@@ -249,12 +236,10 @@ namespace AdventOfCode2022.DaySolutions
                     return (-1, -1);
                 }
             }
-            //
         }
 
         private bool OkayIndex(List<List<char>> map, int startingX, int startingY)
         {
-
             return startingX >= 0 && startingY >= 0 && startingX < map.Count && startingY < map[startingX].Count;
         }
 
