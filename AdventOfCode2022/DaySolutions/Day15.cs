@@ -26,11 +26,6 @@ namespace AdventOfCode2022.DaySolutions
                 }
             }
 
-            //var greaterThanZero = setOfEmptyLocs.Where(((int x, int y) item) => item.x >= 0).ToList();
-            //var lessThanBig = setOfEmptyLocs.Where(((int x, int y) item) => item.x <= 4000000).ToList();
-            //var both = setOfEmptyLocs.Where(((int x, int y) item) => item.x <= 4000000 && item.x >= 0).ToList();
-
-            //both.Sort((x, y) => y.x - x.x);
 
             return setOfEmptyLocs.Count.ToString();
         }
@@ -38,32 +33,44 @@ namespace AdventOfCode2022.DaySolutions
         public override string GetPart2Solution()
         {
             var sensors = ParseSensors();
-            sensors.Sort((x, y) => y._manhattandist - x._manhattandist);
+            //sensors.Sort((x, y) => y._manhattandist - x._manhattandist);
+            int minVal = 0;
+            int maxVal = 4000000;
 
-            var grids = new List<(int minX, int minY, int maxX, int maxY)>();
-            foreach(var sensor in sensors)
+            var perimeterVals = new HashSet<(int x, int y)>();
+            foreach (var sensor in sensors)
             {
-                grids.Add(sensor.GetGridToCheck(0, 4000000));
-            }
-
-            for(int i = 3000; i < 4000000; i++) //made it to 3000 w/o answer //103400 @ 6pm
-            {
-                for (int j = 0; j < 4000000; j++)
+                var perimeterLocs = sensor.GetPerimeterLocations();
+                foreach (var loc in perimeterLocs)
                 {
-                    var emptyFound = false;
-                    foreach(var sensor in sensors)
+                    if(loc.x >= minVal && loc.x <= maxVal && loc.y >= minVal && loc.y <= maxVal)
                     {
-                        if (sensor.LocationIsEmptyDueToMe(i, j))
-                        {
-                            emptyFound = true;
-                            break;
-                        }
-                    }
-                    if(!emptyFound)
-                    {
-                        return (i * 4000000 + j).ToString();
+                        perimeterVals.Add(loc);
                     }
                 }
+            }
+
+            var perimList = perimeterVals.ToList();
+            for (int i = 0; i < perimList.Count; i++) //made it to 3000 w/o answer //103400 @ 6pm
+            {
+                //for (int j = 0; j < 4000000; j++)
+                //{
+
+                var emptyFound = false;
+                foreach (var sensor in sensors)
+                {
+                    if (sensor.LocationIsEmptyDueToMe(perimList[i].x, perimList[i].y))
+                    {
+                        emptyFound = true;
+                        break;
+                    }
+                }
+                if (!emptyFound)
+                {
+                    var item = perimList[i];
+                    return ($"{item.x} * 4000000 + {item.y}");
+                }
+                //}
             }
 
             return "";
@@ -129,7 +136,23 @@ namespace AdventOfCode2022.DaySolutions
                 }
                 return locationsWithoutBeacon;
             }
-            
+
+            public HashSet<(int x, int y)> GetPerimeterLocations()
+            {
+                var perimeterLocations = new HashSet<(int x, int y)>();
+               
+                for(var i = 0; i <= _manhattandist; i++)
+                {
+                    var diff = _manhattandist - i + 1;
+                    perimeterLocations.Add((_xLocation - i, _yLocation - diff));
+                    perimeterLocations.Add((_xLocation + i, _yLocation + diff));
+                    perimeterLocations.Add((_xLocation + diff, _yLocation + i));
+                    perimeterLocations.Add((_xLocation - diff, _yLocation - i));
+                }
+
+                return perimeterLocations;
+            }
+
             public bool LocationIsEmptyDueToMe(int xLoc, int yLoc)
             {
                 var distToSensor = Math.Abs(_xLocation - xLoc) + Math.Abs(_yLocation - yLoc);
@@ -146,29 +169,6 @@ namespace AdventOfCode2022.DaySolutions
                 return (Math.Max(minx, min), Math.Max(min, miny), Math.Min(max, maxx), Math.Min(max, maxy));
             }
 
-
-            //public HashSet<(int x, int y)> GetEmptyLocationsPart2(int min, int max)
-            //{
-            //    var manhattanDistToBeacon = Math.Abs(_xLocation - _beaconXLocation) + Math.Abs(_yLocation - _beaconYLocation);
-            //    var locationsWithoutBeacon = new HashSet<(int x, int y)>();
-
-            //    int yDist = Math.Abs(_yLocation - yRowToCheck);
-            //    for (int i = _xLocation - manhattanDistToBeacon; i < _xLocation + manhattanDistToBeacon; i++)
-            //    {
-
-            //        var manhattanDistToLocation = Math.Abs(_xLocation - i) + yDist;
-            //        if (manhattanDistToLocation <= manhattanDistToBeacon)
-            //        {
-            //            locationsWithoutBeacon.Add((i, yRowToCheck));
-            //        }
-            //    }
-            //    if (_beaconYLocation == yRowToCheck)
-            //    {
-
-            //        locationsWithoutBeacon.RemoveWhere(((int x, int y) item) => item.x == _beaconXLocation && item.y == _beaconYLocation);
-            //    }
-            //    return locationsWithoutBeacon;
-            //}
         }
     }
 }
