@@ -123,19 +123,29 @@ namespace AdventOfCode2022.DaySolutions
         private bool CubeHasPathOut(List<List<List<int>>> cubeGrid, List<int> spaceLoc, List<List<int>> origVisitedLocs)
         {
             //is this a repeat
-            if(origVisitedLocs.Any(x =>  x[0] == spaceLoc[0] || x[1] == spaceLoc[1] || x[2] == spaceLoc[2]))
+            if(origVisitedLocs.Any(x =>  x[0] == spaceLoc[0] && x[1] == spaceLoc[1] && x[2] == spaceLoc[2]))
             {
                 return false;
             }
 
+
+
             //have we left grid
-            if (spaceLoc[0] == 0
-                || spaceLoc[0] == cubeGrid.Count - 1
-                || spaceLoc[1] == 0
-                || spaceLoc[1] == cubeGrid[spaceLoc[0]].Count - 1
-                || spaceLoc[2] == 0
-                || spaceLoc[2] == cubeGrid[spaceLoc[0]][spaceLoc[1]].Count - 1)
+            if (spaceLoc[0] <= 0
+                || spaceLoc[0] >= cubeGrid.Count
+                || spaceLoc[1] <= 0
+                || spaceLoc[1] >= cubeGrid[spaceLoc[0]].Count
+                || spaceLoc[2] <= 0
+                || spaceLoc[2] >= cubeGrid[spaceLoc[0]][spaceLoc[1]].Count)
             {
+                //try
+                //{
+                //    if (cubeGrid[spaceLoc[0]][spaceLoc[1]][spaceLoc[2]] == 1)
+                //    {
+                //        return false; // not hitting here so thats good
+                //    }
+                //}
+                //catch { }
                 return true;
             }
 
@@ -186,31 +196,31 @@ namespace AdventOfCode2022.DaySolutions
             foreach (var cube in cubes)
             {
                 //xdir
-                if (cube[0] == 0 || (cube[0] > 0 && cubeGrid[cube[0] - 1][cube[1]][cube[2]] == 0 && CubeHasPathOut(cubeGrid, new List<int>() { cube[0] - 1, cube[1], cube[2] }, new List<List<int>>()))) // negative x
+                if (CubeHasPathOut(cubeGrid, new List<int>() { cube[0] - 1, cube[1], cube[2] }, new List<List<int>>())) // negative x
                 {
                         numExternalSides++;
                 }
-                if (cube[0] == cubeGrid.Count - 1 || (cube[0] < cubeGrid.Count - 1 && cubeGrid[cube[0] + 1][cube[1]][cube[2]] == 0 && CubeHasPathOut(cubeGrid, new List<int>() { cube[0] + 1, cube[1], cube[2] }, new List<List<int>>()))) // pos x
+                if ( (CubeHasPathOut(cubeGrid, new List<int>() { cube[0] + 1, cube[1], cube[2] }, new List<List<int>>()))) // pos x
                 {
                     numExternalSides++;
                 }
 
                 //ydir
-                if (cube[1] == 0 || (cube[1] > 0 && cubeGrid[cube[0]][cube[1] - 1][cube[2]] == 0 && CubeHasPathOut(cubeGrid, new List<int>() { cube[0], cube[1] - 1, cube[2] }, new List<List<int>>()))) // negative y
+                if ((CubeHasPathOut(cubeGrid, new List<int>() { cube[0], cube[1] - 1, cube[2] }, new List<List<int>>()))) // negative y
                 {
                     numExternalSides++;
                 }
-                if (cube[1] == cubeGrid[cube[0]].Count - 1 || (cube[1] < cubeGrid[cube[0]].Count - 1 && cubeGrid[cube[0]][cube[1] + 1][cube[2]] == 0 && CubeHasPathOut(cubeGrid, new List<int>() { cube[0], cube[1] + 1, cube[2] }, new List<List<int>>()))) // pos y
+                if ((CubeHasPathOut(cubeGrid, new List<int>() { cube[0], cube[1] + 1, cube[2] }, new List<List<int>>()))) // pos y
                 {
                     numExternalSides++;
                 }
 
                 //zdir
-                if (cube[2] == 0 || (cube[2] > 0 && cubeGrid[cube[0]][cube[1]][cube[2] - 1] == 0 && CubeHasPathOut(cubeGrid, new List<int>() { cube[0], cube[1], cube[2] - 1 }, new List<List<int>>()))) // negative z
+                if ((CubeHasPathOut(cubeGrid, new List<int>() { cube[0], cube[1], cube[2] - 1 }, new List<List<int>>()))) // negative z
                 {
                     numExternalSides++;
                 }
-                if (cube[2] == cubeGrid[cube[0]][cube[1]].Count - 1 || (cube[2] < cubeGrid[cube[0]][cube[1]].Count - 1 && cubeGrid[cube[0]][cube[1]][cube[2] + 1] == 0 && CubeHasPathOut(cubeGrid, new List<int>() { cube[0], cube[1], cube[2] + 1}, new List<List<int>>()))) // pos z
+                if ( (CubeHasPathOut(cubeGrid, new List<int>() { cube[0], cube[1], cube[2] + 1}, new List<List<int>>()))) // pos z
                 {
                     numExternalSides++;
                 }
