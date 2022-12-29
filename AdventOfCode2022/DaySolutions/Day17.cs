@@ -142,17 +142,6 @@ namespace AdventOfCode2022.DaySolutions
 
             private void SetRockDown(HashSet<(int xi, int yj)> locations, int height)
             {
-                //var prevRockHeight = GetHeight();
-
-                //for(int i = 1; i <= height; i ++)
-                //{
-                //    var currentXValues = locations.Where(((int xi, int yi) loc) => loc.yi == prevRockHeight + i).Select(((int xi, int yi) loc) => loc.xi).ToList();
-                //    foreach(var x in currentXValues)
-                //    {
-                //        _chamber[x] = prevRockHeight + i;
-                //    }
-                //}
-
                 foreach (var location in locations)
                 {
                     _chamber[location.xi][location.yj] = 1;
@@ -162,14 +151,6 @@ namespace AdventOfCode2022.DaySolutions
             private bool IsRockInBounds(HashSet<(int xi, int yj)> locations)
             {
                 var anyOverWall = locations.Any(((int xi, int yi) loc) => loc.xi < 0 || loc.xi >= _chamber.Count || loc.yi < 0);
-
-                //for(int i = 0; i < _chamber.Count; i++)
-                //{
-                //    if (locations.Contains((i, _chamber[i])) || locations.Contains((i, -1)))
-                //    {
-                //        return false;
-                //    }
-                //}
 
                 if (anyOverWall)
                 {
