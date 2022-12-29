@@ -14,21 +14,89 @@ namespace AdventOfCode2022.DaySolutions
         {
             var chamberWidth = 7;
             var numRocksToFall = 2022;
-            //var numRocksToFall = 200;
+            //var modularVal = 200;
+            //var modularVal = _rawInput.Length;
+            var modularVal = _rawInput.Length;
 
             var rockTypeOrder = new RockType[5] { RockType.HorizLine, RockType.Plus, RockType.L, RockType.VertLine, RockType.Square };
             var rockTypeLocation = 0;
 
             var chamber = new Chamber(chamberWidth, _rawInput);
 
+            var heightsArr = new List<List<int>>();
+            List<(string vals, int iteration)> flattenedHeightStringsBuilt = new List<(string vals, int iteration)>();
+            var firstDup = 0;
+            var countWithoutDup = 0;
+
+            var lastNonDup = 0;
+
             for (var i = 0; i < numRocksToFall; i++)
             {
                 var rockType = rockTypeOrder[rockTypeLocation % rockTypeOrder.Length];
                 rockTypeLocation++;
                 chamber.AddRock(rockType);
+                //if(i % modularVal == 0)
+                //{
+                var heights = chamber.GetAllHeights();
+                var minHeight = heights.Min();
+                var str = "";
+                for (int j = 0; j < heights.Count; j++)
+                {
+                    str += $"{heights[j] - minHeight},";
+                }
+                if(flattenedHeightStringsBuilt.Count(x => x.vals == str) > 0 )
+                {
+                    if(firstDup == 0)
+                    {
+                        firstDup = i;
+                    }
+                    //var duplicate = i;
+                } else
+                {
+                    if(firstDup != 0)
+                    {
+                        //var valeWithoutDup = i;
+                        countWithoutDup++;
+                        lastNonDup = i;
+                    }
+                }
+
+                flattenedHeightStringsBuilt.Add((str, i));
+                heightsArr.Add(heights);
+                //}
             }
 
-            var fullRows = chamber.GetFullRows();
+
+            var flattenedHeights = new List<List<int>>();
+
+            for(int i = 0; i < heightsArr.Count; i ++)
+            {
+                flattenedHeights.Add(new List<int>());
+                var min = heightsArr[i].Min();
+                for(int j = 0; j < heightsArr[i].Count; j++)
+                {
+                    flattenedHeights[i].Add(heightsArr[i][j] - min);
+                }
+            }
+
+            List<(string vals, int iteration)> flattenedHeightStrings = new List<(string vals, int iteration)>();
+            for (int i = 0; i < flattenedHeights.Count; i++)
+            {
+                var str = "";
+                for (int j = 0; j < flattenedHeights[i].Count; j++)
+                {
+                    str += $"{flattenedHeights[i][j]},";
+                }
+                flattenedHeightStrings.Add((str, i));
+            }
+
+            flattenedHeightStrings.Sort((x, y) => { 
+                if(x.vals != y.vals)
+                {
+                    return x.vals.CompareTo(y.vals);
+                }
+                return x.iteration - y.iteration;  
+            });
 
             return chamber.GetHeight().ToString();
         }
@@ -52,7 +120,124 @@ namespace AdventOfCode2022.DaySolutions
 
             //return chamber.GetHeight().ToString();
 
-            return "";
+            var chamberWidth = 7;
+            var numRocksToFall = _rawInput.Length * 3; //this may be an issue
+            //var modularVal = 200;
+            //var modularVal = _rawInput.Length;
+
+            //these 2 numbers cam from eyeballing the height diffs & looking for patterns. i dont know the pattern yet but o well
+            var modularVal = 1740;
+            //var modularVal = 35;
+
+            var rockTypeOrder = new RockType[5] { RockType.HorizLine, RockType.Plus, RockType.L, RockType.VertLine, RockType.Square };
+            var rockTypeLocation = 0;
+
+            var chamber = new Chamber(chamberWidth, _rawInput);
+
+            var heightsArr = new List<List<int>>();
+            List<(string vals, int iteration)> flattenedHeightStringsBuilt = new List<(string vals, int iteration)>();
+            //var firstDup = 0;
+            //var countWithoutDup = 0;
+
+            //var lastNonDup = 0;
+
+            for (var i = 0; i < numRocksToFall; i++)
+            {
+                var rockType = rockTypeOrder[rockTypeLocation % rockTypeOrder.Length];
+                rockTypeLocation++;
+                chamber.AddRock(rockType);
+                //if(i % modularVal == 0)
+                //{
+                var heights = chamber.GetAllHeights();
+                //var minHeight = heights.Min();
+                //var str = "";
+                //for (int j = 0; j < heights.Count; j++)
+                //{
+                //    str += $"{heights[j] - minHeight},";
+                //}
+                //if (flattenedHeightStringsBuilt.Count(x => x.vals == str) > 0)
+                //{
+                //    if (firstDup == 0)
+                //    {
+                //        firstDup = i;
+                //    }
+                //    //var duplicate = i;
+                //}
+                //else
+                //{
+                //    if (firstDup != 0)
+                //    {
+                //        //var valeWithoutDup = i;
+                //        countWithoutDup++;
+                //        lastNonDup = i;
+                //    }
+                //}
+
+                //flattenedHeightStringsBuilt.Add((str, i));
+                heightsArr.Add(heights);
+                //}
+            }
+
+
+            //var flattenedHeights = new List<List<int>>();
+
+            //for (int i = 0; i < heightsArr.Count; i++)
+            //{
+            //    flattenedHeights.Add(new List<int>());
+            //    var min = heightsArr[i].Min();
+            //    for (int j = 0; j < heightsArr[i].Count; j++)
+            //    {
+            //        flattenedHeights[i].Add(heightsArr[i][j] - min);
+            //    }
+            //}
+
+            //List<(string vals, int iteration)> flattenedHeightStrings = new List<(string vals, int iteration)>();
+            //for (int i = 0; i < flattenedHeights.Count; i++)
+            //{
+            //    var str = "";
+            //    for (int j = 0; j < flattenedHeights[i].Count; j++)
+            //    {
+            //        str += $"{flattenedHeights[i][j]},";
+            //    }
+            //    flattenedHeightStrings.Add((str, i));
+            //}
+
+            //flattenedHeightStrings.Sort((x, y) => {
+            //    if (x.vals != y.vals)
+            //    {
+            //        return x.vals.CompareTo(y.vals);
+            //    }
+            //    return x.iteration - y.iteration;
+            //});
+
+            //return chamber.GetHeight().ToString();
+            var totalNumRocksToFall = 1000000000000;
+
+            int mod = (int) (totalNumRocksToFall % modularVal);
+
+            while(mod < _rawInput.Length)
+            {
+                mod += modularVal;
+            }
+
+            var lowerMatchingRow = heightsArr[mod - 1];
+            var upperMatchingRow = heightsArr[mod + modularVal - 1];
+
+            var diffRow = new List<int>();
+            for(var i = 0; i < lowerMatchingRow.Count; i++)
+            {
+                diffRow.Add(upperMatchingRow[i] - lowerMatchingRow[i]);
+            }
+
+            var iterationsToAdd = (totalNumRocksToFall - mod) / modularVal;
+
+            var totalRow = new List<long>();
+            for (var i = 0; i < lowerMatchingRow.Count; i++)
+            {
+                totalRow.Add(lowerMatchingRow[i] + (diffRow[i] * iterationsToAdd));
+            }
+
+            return totalRow.Max().ToString();
         }
 
         public enum RockType
@@ -224,6 +409,11 @@ namespace AdventOfCode2022.DaySolutions
                 }
 
                 return fullRows;
+            }
+
+            public List<int> GetAllHeights()
+            {
+                return _chamber.Select(x => Math.Max(x.FindLastIndex(y => y == 1) + 1, 0)).ToList();
             }
         }
     }
