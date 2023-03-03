@@ -8,8 +8,15 @@ namespace AdventOfCode2022
         static void Main(string[] args)
         {
             var solver = GetSolver();
-            Console.WriteLine($"Part 1 Solution: {solver.GetPart1Solution()}");
-            Console.WriteLine($"Part 2 Solution: {solver.GetPart2Solution()}");
+            var startingTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            var part1Solution = solver.GetPart1Solution();
+            var timeInBetweenParts = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            var part2Solution = solver.GetPart2Solution();
+            var endingTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+            Console.WriteLine($"Part 1 \nSolution: {part1Solution}\nTime Taken(ms): {timeInBetweenParts - startingTime}");
+            Console.WriteLine($"Part 2 \nSolution: {part2Solution}\nTime Taken(ms): {endingTime - timeInBetweenParts}");
+            Console.WriteLine($"\nStart: {startingTime}\nMiddle: {timeInBetweenParts}\nEnd: {endingTime}");
         }
 
         private static DaySolver GetSolver()
